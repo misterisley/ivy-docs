@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nested Intents - Interactive Ivy / Symmio Pitch</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;650;800&family=Chivo:wght@400;520;650;760;900&display=swap");
+
+    :root {
+      --ink: oklch(96% 0.018 243);
+      --ink-strong: oklch(99% 0.012 235);
+      --muted: oklch(76% 0.05 250);
+      --dim: oklch(61% 0.045 252);
+      --bg: oklch(13% 0.045 255);
+      --bg-deep: oklch(8% 0.04 260);
+      --panel: oklch(19% 0.055 254);
+      --panel-2: oklch(24% 0.06 250);
+      --line: oklch(100% 0 0 / 14%);
+      --blue: oklch(78% 0.125 224);
+      --mint: oklch(85% 0.15 155);
+      --amber: oklch(83% 0.13 80);
+      --rose: oklch(78% 0.14 16);
+      --violet: oklch(79% 0.12 290);
+      --paper: oklch(94% 0.025 82);
+      --paper-ink: oklch(20% 0.04 245);
+      --shadow: 0 30px 80px oklch(3% 0.02 250 / 55%);
+      --radius-lg: 34px;
+      --radius-md: 22px;
+      --radius-sm: 14px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --space-8: 64px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 28px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, oklch(75% 0.13 224 / 20%), transparent 31%),
+        radial-gradient(circle at 86% 0%, oklch(79% 0.13 290 / 16%), transparent 30%),
+        linear-gradient(120deg, var(--bg-deep), var(--bg) 42%, oklch(10% 0.038 242));
+      font-family: Chivo, ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.62;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 292px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: var(--space-6) var(--space-5);
+      border-inline-end: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, oklch(12% 0.045 252 / 94%), oklch(8% 0.035 260 / 96%)),
+        var(--bg-deep);
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: grid;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      color: var(--paper-ink);
+      background: conic-gradient(from 160deg, var(--mint), var(--blue), var(--violet), var(--amber), var(--mint));
+      border-radius: 18px 18px 9px 18px;
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-weight: 800;
+      box-shadow: 0 18px 42px oklch(4% 0.04 250 / 42%);
+    }
+
+    .brand h1 {
+      margin: 0;
+      max-width: 10ch;
+      color: var(--ink-strong);
+      font-size: 1.9rem;
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .brand p {
+      margin: 0;
+      max-width: 24ch;
+      color: var(--dim);
+      font-size: 0.92rem;
+    }
+
+    .nav-label {
+      margin: 0 0 var(--space-3);
+      color: var(--dim);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: grid;
+      gap: var(--space-1);
+      margin-bottom: var(--space-7);
+    }
+
+    .nav a {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: var(--space-3);
+      align-items: center;
+      padding: 10px 8px;
+      color: var(--muted);
+      border-radius: 13px;
+      font-size: 0.9rem;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--ink-strong);
+      background: oklch(100% 0 0 / 7%);
+      transform: translateX(2px);
+    }
+
+    .nav-num {
+      color: var(--blue);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .side-card {
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: oklch(100% 0 0 / 5%);
+    }
+
+    .side-card strong {
+      display: block;
+      margin-bottom: var(--space-2);
+      color: var(--ink-strong);
+      letter-spacing: -0.02em;
+    }
+
+    .side-card span {
+      color: var(--dim);
+      font-size: 0.9rem;
+    }
+
+    main {
+      width: min(1220px, 100%);
+      padding: var(--space-7) clamp(20px, 5vw, 72px) var(--space-8);
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
+      gap: clamp(24px, 4vw, 56px);
+      align-items: stretch;
+      min-height: calc(100vh - 96px);
+      padding: clamp(34px, 5vw, 70px);
+      border: 1px solid var(--line);
+      border-radius: 44px;
+      background:
+        linear-gradient(145deg, oklch(20% 0.06 253 / 92%), oklch(13% 0.05 260 / 94%)),
+        var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: -180px;
+      border-radius: 999px;
+      background: radial-gradient(circle, oklch(80% 0.14 218 / 20%), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-copy,
+    .hero-visual {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      padding: 8px 12px;
+      color: var(--mint);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: oklch(100% 0 0 / 5%);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .hero h2 {
+      margin-bottom: var(--space-5);
+      max-width: 10.5ch;
+      color: var(--ink-strong);
+      font-size: clamp(4rem, 11vw, 9.6rem);
+      line-height: 0.86;
+      letter-spacing: -0.085em;
+    }
+
+    .hero .lead {
+      max-width: 63ch;
+      color: var(--ink);
+      font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-strong);
+      background: oklch(100% 0 0 / 7%);
+      font-weight: 760;
+    }
+
+    .button.primary {
+      color: var(--paper-ink);
+      background: var(--mint);
+      border-color: transparent;
+    }
+
+    .hero-visual {
+      display: grid;
+      align-content: end;
+      gap: var(--space-4);
+    }
+
+    .diagram-card {
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: oklch(9% 0.04 260 / 68%);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+
+    .stat {
+      min-height: 116px;
+      padding: var(--space-4);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: oklch(100% 0 0 / 5%);
+    }
+
+    .stat b {
+      display: block;
+      margin-bottom: var(--space-2);
+      color: var(--ink-strong);
+      font-size: 1.45rem;
+      letter-spacing: -0.04em;
+    }
+
+    .stat span {
+      color: var(--dim);
+      font-size: 0.9rem;
+    }
+
+    .section {
+      margin-top: var(--space-8);
+      scroll-margin-top: var(--space-5);
+    }
+
+    .section-header {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(260px, 0.55fr);
+      gap: var(--space-6);
+      align-items: end;
+      margin-bottom: var(--space-6);
+    }
+
+    .section-kicker {
+      margin-bottom: var(--space-3);
+      color: var(--amber);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .section h2 {
+      margin-bottom: 0;
+      color: var(--ink-strong);
+      font-size: clamp(2.2rem, 5vw, 5.2rem);
+      line-height: 0.96;
+      letter-spacing: -0.07em;
+    }
+
+    .section-header p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .panel {
+      padding: clamp(22px, 3vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(145deg, oklch(100% 0 0 / 7%), oklch(100% 0 0 / 3%)),
+        var(--panel);
+      box-shadow: 0 22px 58px oklch(3% 0.02 250 / 30%);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: oklch(100% 0 0 / 4.5%);
+    }
+
+    .card h3 {
+      margin-bottom: var(--space-3);
+      color: var(--ink-strong);
+      font-size: 1.22rem;
+      letter-spacing: -0.025em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .mini-label {
+      display: block;
+      margin-bottom: var(--space-3);
+      color: var(--blue);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .quote {
+      padding: clamp(24px, 4vw, 44px);
+      border-radius: var(--radius-lg);
+      color: var(--paper-ink);
+      background:
+        radial-gradient(circle at 85% 20%, oklch(99% 0.06 95 / 60%), transparent 34%),
+        var(--paper);
+    }
+
+    .quote p {
+      margin-bottom: 0;
+      max-width: 70ch;
+      color: var(--paper-ink);
+      font-size: clamp(1.4rem, 3vw, 2.35rem);
+      font-weight: 760;
+      line-height: 1.18;
+      letter-spacing: -0.045em;
+    }
+
+    .code {
+      overflow-x: auto;
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      color: oklch(88% 0.05 225);
+      background: oklch(6% 0.035 260);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.84rem;
+      line-height: 1.62;
+      white-space: pre;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink-strong);
+      background: oklch(100% 0 0 / 6%);
+      font-size: 0.86rem;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    li:last-child {
+      margin-bottom: 0;
+    }
+
+    .topic-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-5);
+    }
+
+    .pill {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: oklch(100% 0 0 / 4%);
+      font-size: 0.86rem;
+      font-weight: 650;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+
+    .compare-card {
+      display: grid;
+      gap: var(--space-3);
+      min-height: 230px;
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: oklch(100% 0 0 / 4.5%);
+    }
+
+    .compare-card.ivy {
+      color: var(--paper-ink);
+      background: linear-gradient(135deg, var(--mint), var(--blue));
+      border-color: transparent;
+    }
+
+    .compare-card.ivy h3,
+    .compare-card.ivy p,
+    .compare-card.ivy .mini-label {
+      color: var(--paper-ink);
+    }
+
+    .timeline {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .timeline-step {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: var(--space-5);
+      align-items: start;
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: oklch(100% 0 0 / 4.5%);
+    }
+
+    .timeline-step b {
+      color: var(--mint);
+      font-family: "Azeret Mono", ui-monospace, monospace;
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .timeline-step h3 {
+      margin-bottom: var(--space-2);
+    }
+
+    .motion-graphic {
+      min-height: 420px;
+    }
+
+    .source-list {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .source-list a {
+      display: block;
+      padding: var(--space-4);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      background: oklch(100% 0 0 / 4%);
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .source-list a:hover {
+      color: var(--ink-strong);
+      background: oklch(100% 0 0 / 7%);
+    }
+
+    footer {
+      margin-top: var(--space-8);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--line);
+      color: var(--dim);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+        padding: var(--space-5);
+      }
+
+      .nav {
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      }
+
+      .side-card {
+        display: none;
+      }
+
+      .hero,
+      .section-header,
+      .grid.two,
+      .grid.three,
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      main {
+        padding: var(--space-5) var(--space-4) var(--space-7);
+      }
+
+      .hero {
+        min-height: auto;
+        padding: var(--space-5);
+        border-radius: 30px;
+      }
+
+      .hero h2 {
+        font-size: clamp(3.2rem, 18vw, 5rem);
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-step {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.86rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .nav a {
+        transition: none;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: #111827;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      main {
+        width: auto;
+        padding: 0;
+      }
+
+      .hero,
+      .section,
+      .panel {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Pitch navigation">
+      <div class="brand">
+        <div class="brand-mark">NI</div>
+        <h1>Nested Intents</h1>
+        <p>Interactive pitch for Ivy / Symmio programmable execution.</p>
+      </div>
+      <p class="nav-label">Sections</p>
+      <nav class="nav">
+        <a href="#thesis"><span class="nav-num">01</span><span>Thesis</span></a>
+        <a href="#speed"><span class="nav-num">02</span><span>Speed Race</span></a>
+        <a href="#comparison"><span class="nav-num">03</span><span>Intent Landscape</span></a>
+        <a href="#primitive"><span class="nav-num">04</span><span>Core Primitive</span></a>
+        <a href="#adaptive"><span class="nav-num">05</span><span>Adaptive Intents</span></a>
+        <a href="#auctions"><span class="nav-num">06</span><span>Silent Auctions</span></a>
+        <a href="#exchange"><span class="nav-num">07</span><span>Better Exchanges</span></a>
+        <a href="#compute"><span class="nav-num">08</span><span>Compute Market</span></a>
+        <a href="#implementation"><span class="nav-num">09</span><span>V1 Architecture</span></a>
+        <a href="#roadmap"><span class="nav-num">10</span><span>Proof Roadmap</span></a>
+        <a href="#close"><span class="nav-num">11</span><span>Final Pitch</span></a>
+      </nav>
+      <div class="side-card">
+        <strong>Core sentence</strong>
+        <span>BestEx is not best price now. It is best valid execution over time.</span>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" id="thesis">
+        <div class="hero-copy">
+          <div class="eyebrow">Ivy / Symmio research pitch</div>
+          <h2>Stop racing engines.</h2>
+          <p class="lead">
+            Nested Intents turn short-lived orders into persistent execution mandates. They let users express what they want, when execution is valid, and how the mandate may adapt when verified market state changes.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#primitive">See the primitive</a>
+            <a class="button" href="#compute">Compute market</a>
+            <a class="button" href="#roadmap">Proof roadmap</a>
+          </div>
+          <div class="topic-strip">
+            <span class="pill">Persistent mandates</span>
+            <span class="pill">Programmable guards</span>
+            <span class="pill">Adaptive intent fields</span>
+            <span class="pill">Muon verification</span>
+            <span class="pill">SYMMIO compute fees</span>
+            <span class="pill">Provable BestEx</span>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="diagram-card">
+            <svg viewBox="0 0 760 520" role="img" aria-label="Nested intents move markets from speed to model quality">
+              <defs>
+                <marker id="arrow-main" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                  <path d="M0,0 L0,8 L11,4 z" fill="oklch(78% 0.125 224)" />
+                </marker>
+              </defs>
+              <rect x="42" y="74" width="250" height="150" rx="30" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 18%)" />
+              <text x="167" y="128" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="28" font-weight="900">Old Market</text>
+              <text x="167" y="171" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="18">Who updates first?</text>
+              <path d="M302 150 H430" stroke="oklch(78% 0.125 224)" stroke-width="6" marker-end="url(#arrow-main)" />
+              <rect x="445" y="52" width="270" height="194" rx="36" fill="oklch(85% 0.15 155)" />
+              <text x="580" y="119" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="31" font-weight="900">New Market</text>
+              <text x="580" y="164" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="19" font-weight="760">Who has the better model?</text>
+              <text x="580" y="194" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="19" font-weight="760">Who proves validity?</text>
+              <rect x="95" y="318" width="570" height="98" rx="28" fill="oklch(6% 0.035 260)" stroke="oklch(100% 0 0 / 16%)" />
+              <text x="380" y="358" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="24" font-weight="900">Nested Intent</text>
+              <text x="380" y="390" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="17">Base outcome + execution predicate + compute budget</text>
+            </svg>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><b>2 layers</b><span>Base intent plus nested verifier.</span></div>
+            <div class="stat"><b>3 states</b><span>Execute, block, or transform in flight.</span></div>
+            <div class="stat"><b>1 endgame</b><span>Provable best valid execution.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="speed">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">The computer-age failure mode</div>
+            <h2>Finance became a competition in machine speed.</h2>
+          </div>
+          <p>
+            Electronic markets repeatedly solved execution problems by increasing speed: faster data, faster matching, faster networking, faster cancellation, faster repricing, and faster market makers.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>Crypto is replaying TradFi at higher speed</h3>
+            <p>
+              Bitcoin introduced ten-minute block times. Ethereum added programmable execution measured in seconds. Solana pushed public-chain execution toward sub-second latency. Hyperliquid, MegaETH, and other high-performance systems now compete on throughput and latency for increasingly sophisticated strategies.
+            </p>
+            <p>
+              The infrastructure is impressive, but it risks importing the same market-structure outcome: the largest rewards flow to firms that can afford the fastest systems, privileged infrastructure, and colocated execution.
+            </p>
+          </div>
+          <div class="panel">
+            <svg class="motion-graphic" viewBox="0 0 860 520" role="img" aria-label="Speed arms race loop">
+              <defs>
+                <marker id="race-arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                  <path d="M0,0 L0,8 L11,4 z" fill="oklch(78% 0.14 16)" />
+                </marker>
+              </defs>
+              <circle cx="430" cy="260" r="142" fill="none" stroke="oklch(78% 0.14 16)" stroke-width="8" stroke-dasharray="18 14" />
+              <text x="430" y="250" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="34" font-weight="900">Speed</text>
+              <text x="430" y="288" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="18">arms race</text>
+              <rect x="62" y="92" width="210" height="88" rx="22" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+              <text x="167" y="145" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Update faster</text>
+              <path d="M272 132 C370 62 555 70 678 130" fill="none" stroke="oklch(78% 0.14 16)" stroke-width="5" marker-end="url(#race-arrow)" />
+              <rect x="678" y="92" width="150" height="88" rx="22" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+              <text x="753" y="145" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Cancel</text>
+              <path d="M760 180 C812 285 720 405 565 412" fill="none" stroke="oklch(78% 0.14 16)" stroke-width="5" marker-end="url(#race-arrow)" />
+              <rect x="325" y="375" width="240" height="88" rx="22" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+              <text x="445" y="428" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Route faster</text>
+              <path d="M325 419 C178 402 80 285 145 181" fill="none" stroke="oklch(78% 0.14 16)" stroke-width="5" marker-end="url(#race-arrow)" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="quote" style="margin-top: 16px;">
+          <p>The goal is not to end automation. The goal is to reduce structural dependence on high-frequency reaction speed as the primary defense against stale execution.</p>
+        </div>
+      </section>
+
+      <section class="section" id="comparison">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Intent landscape</div>
+            <h2>Existing intents solve outcomes. Nested Intents govern permission.</h2>
+          </div>
+          <p>
+            CoW Swap, NEAR Intents, and Anoma already support declarative requirements. Nested Intents extend that model into persistent programmable execution policy.
+          </p>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-card">
+            <span class="mini-label">CoW Swap</span>
+            <h3>Batch settlement</h3>
+            <p>Solver competition, batch auctions, Coincidence of Wants, limit prices, and optimized settlement for swaps.</p>
+          </div>
+          <div class="compare-card">
+            <span class="mini-label">NEAR Intents</span>
+            <h3>Outcome fulfillment</h3>
+            <p>Users specify cross-chain outcomes and third parties compete to provide the best fulfillment path.</p>
+          </div>
+          <div class="compare-card">
+            <span class="mini-label">Anoma</span>
+            <h3>Valid state transitions</h3>
+            <p>Intent-centric applications where solvers discover counterparties and compute valid state transitions.</p>
+          </div>
+          <div class="compare-card ivy">
+            <span class="mini-label">Ivy</span>
+            <h3>Execution permission</h3>
+            <p>Even if a solver can execute, the user's nested verifier decides whether execution is allowed right now.</p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+          <table>
+            <thead>
+              <tr>
+                <th>System</th>
+                <th>Primary question</th>
+                <th>Nested Intent distinction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CoW-style batch auction</td>
+                <td>Who can settle this batch best?</td>
+                <td>Nested Intents ask whether the proposed execution still satisfies the user's verifier.</td>
+              </tr>
+              <tr>
+                <td>NEAR-style intents</td>
+                <td>Who can fulfill this cross-chain outcome best?</td>
+                <td>Nested Intents define when fulfillment is permitted, not only how it is fulfilled.</td>
+              </tr>
+              <tr>
+                <td>Anoma-style architecture</td>
+                <td>Can these intents be solved into valid state transitions?</td>
+                <td>Nested Intents add execution-time conditional permission to settle.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="primitive">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Core primitive</div>
+            <h2>A base intent plus a persistent execution guard.</h2>
+          </div>
+          <p>
+            The base layer defines what the user wants. The nested layer defines whether execution remains valid whenever a solver attempts to execute.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <div class="code">Base Intent:
+  "What do I want?"
+
+Nested Intent:
+  "Under what conditions is execution still valid?"
+
+Verifier:
+  canExecute(intent, bid, marketState, oracleState, userLogic)
+    -> true | false</div>
+            <p style="margin-top: 18px;">
+              The innovation is not merely a bytes field. The bytes are transport. The primitive is the execution model: a first-class verifier that remains attached to the mandate across its lifetime.
+            </p>
+          </div>
+          <div class="panel">
+            <svg viewBox="0 0 860 520" role="img" aria-label="Nested intent execution flow">
+              <defs>
+                <marker id="primitive-arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                  <path d="M0,0 L0,8 L11,4 z" fill="oklch(78% 0.125 224)" />
+                </marker>
+              </defs>
+              <rect x="52" y="174" width="210" height="122" rx="26" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+              <text x="157" y="225" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="25" font-weight="900">Base intent</text>
+              <text x="157" y="258" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="16">desired outcome</text>
+              <path d="M270 235 H358" stroke="oklch(78% 0.125 224)" stroke-width="5" marker-end="url(#primitive-arrow)" />
+              <rect x="370" y="112" width="260" height="246" rx="34" fill="oklch(12% 0.045 260)" stroke="oklch(78% 0.125 224 / 65%)" />
+              <text x="500" y="170" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="25" font-weight="900">Nested verifier</text>
+              <text x="500" y="214" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="16">market data</text>
+              <text x="500" y="240" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="16">oracle data</text>
+              <text x="500" y="266" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="16">custom logic</text>
+              <text x="500" y="315" fill="oklch(85% 0.15 155)" text-anchor="middle" font-size="20" font-weight="900">true / false</text>
+              <path d="M640 235 H728" stroke="oklch(78% 0.125 224)" stroke-width="5" marker-end="url(#primitive-arrow)" />
+              <rect x="740" y="174" width="88" height="122" rx="24" fill="oklch(85% 0.15 155)" />
+              <text x="784" y="227" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="18" font-weight="900">Exec</text>
+              <text x="784" y="254" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="18" font-weight="900">if true</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="adaptive">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Most expressive form</div>
+            <h2>Nested Intents can transform the underlying fields.</h2>
+          </div>
+          <p>
+            Existing declarative intents check whether fixed conditions are satisfied. Nested Intents can also define how the intent itself should adapt before execution when verified inputs justify the change.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>Three possible outcomes</h3>
+            <div class="code">1. canExecute(...) == true
+   -> execute
+
+2. canExecute(...) == false
+   -> block execution
+
+3. transformIntent(...) returns updatedIntent
+   -> modify terms in flight, then verify again</div>
+          </div>
+          <div class="panel">
+            <h3>Concrete threshold example</h3>
+            <p>
+              A Nested Intent may initially define a minimum acceptable price of <strong>10 USD</strong>, but its nested policy can permit that threshold to adjust to <strong>9.50 USD</strong> at execution time if oracle data, on-chain conditions, and user-defined logic justify the change.
+            </p>
+            <div class="code">transformIntent(intent, marketState, oracleState, userLogic)
+  -> updatedIntent
+
+canExecute(updatedIntent, bid, marketState, oracleState)
+  -> true | false</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="auctions">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Long-term silent auctions</div>
+            <h2>Execution no longer has to happen instantly.</h2>
+          </div>
+          <p>
+            If the mandate is guarded by a nested verifier, a bid can remain live for hours, weeks, months, or even years without becoming an unsafe stale order.
+          </p>
+        </div>
+
+        <div class="panel">
+          <svg viewBox="0 0 1000 440" role="img" aria-label="Long-term silent auction timeline">
+            <line x1="90" y1="250" x2="910" y2="250" stroke="oklch(100% 0 0 / 26%)" stroke-width="4" />
+            <circle cx="130" cy="250" r="18" fill="oklch(78% 0.125 224)" />
+            <circle cx="342" cy="250" r="18" fill="oklch(83% 0.13 80)" />
+            <circle cx="560" cy="250" r="18" fill="oklch(79% 0.12 290)" />
+            <circle cx="792" cy="250" r="18" fill="oklch(85% 0.15 155)" />
+            <text x="130" y="184" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Day 0</text>
+            <text x="130" y="216" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="15">Mandate opens</text>
+            <text x="342" y="184" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Day 7</text>
+            <text x="342" y="216" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="15">Market changes</text>
+            <text x="560" y="184" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Month 3</text>
+            <text x="560" y="216" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="15">Solver proposes</text>
+            <text x="792" y="184" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="18" font-weight="900">Year 2</text>
+            <text x="792" y="216" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="15">Execute if valid</text>
+            <rect x="180" y="305" width="640" height="72" rx="24" fill="oklch(6% 0.035 260)" stroke="oklch(100% 0 0 / 16%)" />
+            <text x="500" y="350" fill="oklch(85% 0.15 155)" text-anchor="middle" font-size="20" font-weight="900">The nested verifier guards the mandate the entire time</text>
+          </svg>
+        </div>
+
+        <div class="grid three" style="margin-top: 16px;">
+          <div class="card"><span class="mini-label">Without Nested Intents</span><p>Market changes force cancel-and-replace cycles. The user protects themselves by updating faster.</p></div>
+          <div class="card"><span class="mini-label">With Nested Intents</span><p>Market changes are absorbed by the verifier. Execution occurs only when the policy still passes.</p></div>
+          <div class="card"><span class="mini-label">BestEx over time</span><p>The executor selects the best valid proposal, not simply the fastest or earliest proposal.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="exchange">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Marketplace design</div>
+            <h2>Better exchanges need both sides to trust validity.</h2>
+          </div>
+          <p>
+            Nested Intents let exchanges such as Ivy Markets organize around longer-lived, model-aware liquidity instead of immediate cancellation and replacement.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>Sellers get durable indications of interest</h3>
+            <p>
+              Sellers can observe bids that remain governed by explicit validity rules. The bid may adapt as markets move, but it does not become an opaque promise. It remains tied to a verifiable execution policy.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>Buyers preserve their risk models</h3>
+            <p>
+              Buyers can submit bids that evolve with market conditions while remaining constrained by their pricing assumptions, exposure limits, liquidity requirements, and model-defined view of fair execution.
+            </p>
+          </div>
+        </div>
+
+        <div class="quote" style="margin-top: 16px;">
+          <p>Liquidity can remain present during market stress, but executable only when the conditions specified by both buyers and sellers continue to hold.</p>
+        </div>
+      </section>
+
+      <section class="section" id="compute">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">SYMMIO compute market</div>
+            <h2>Arbitrary verification must be paid for.</h2>
+          </div>
+          <p>
+            If users can attach Turing-complete or arbitrary verification logic, the protocol needs a compute market. Simple checks are cheap; complex models must fund their own evaluation.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <div class="code">ExecutionPriority =
+  ExpectedExecutionProfit
+  + SYMMIOComputeFee
+  - VerificationCost
+  - RiskPenalty</div>
+            <p style="margin-top: 18px;">
+              A high-value intent with extremely expensive verification may be less attractive than a slightly lower-value intent with cheap verification, unless the user attaches enough compute budget.
+            </p>
+          </div>
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Term</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ComputeRequired</td>
+                  <td>The finite work needed to evaluate <code>canExecute(...)</code>.</td>
+                </tr>
+                <tr>
+                  <td>ComputeBudget</td>
+                  <td>SYMMIO deposited or authorized by the intent creator.</td>
+                </tr>
+                <tr>
+                  <td>ComputeFee</td>
+                  <td>SYMMIO paid to verifiers, executors, oracle networks, or proof systems.</td>
+                </tr>
+                <tr>
+                  <td>VerificationCost</td>
+                  <td>The actual resource burden of computation, proof, or oracle work.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid three" style="margin-top: 16px;">
+          <div class="card"><h3>Simple verifier</h3><p>Min/max price protection. Low compute. Low fee.</p></div>
+          <div class="card"><h3>Template verifier</h3><p>Volatility, liquidity, funding, time window, portfolio exposure, or solver reputation.</p></div>
+          <div class="card"><h3>Custom verifier</h3><p>Muon-verified programs, oracle inputs, market statistics, or user-supplied model logic.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="implementation">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Practical V1</div>
+            <h2>Start with min/max price and PartyB passthrough.</h2>
+          </div>
+          <p>
+            The first version does not need a massive custom model. It can start with the simplest valuable nested verifier: execute only if the final execution price is inside the bidder's range.
+          </p>
+        </div>
+
+        <div class="panel">
+          <svg viewBox="0 0 1040 500" role="img" aria-label="V1 execution architecture">
+            <defs>
+              <marker id="impl-arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                <path d="M0,0 L0,8 L11,4 z" fill="oklch(78% 0.125 224)" />
+              </marker>
+            </defs>
+            <rect x="54" y="95" width="185" height="95" rx="22" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+            <text x="146" y="134" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="19" font-weight="900">Bidder</text>
+            <text x="146" y="161" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="14">sets min/max</text>
+            <path d="M246 142 H330" stroke="oklch(78% 0.125 224)" stroke-width="5" marker-end="url(#impl-arrow)" />
+            <rect x="338" y="95" width="205" height="95" rx="22" fill="oklch(20% 0.055 254)" stroke="oklch(100% 0 0 / 20%)" />
+            <text x="440" y="134" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="19" font-weight="900">Solver</text>
+            <text x="440" y="161" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="14">proposes execution</text>
+            <path d="M550 142 H634" stroke="oklch(78% 0.125 224)" stroke-width="5" marker-end="url(#impl-arrow)" />
+            <rect x="642" y="95" width="250" height="95" rx="22" fill="oklch(12% 0.045 260)" stroke="oklch(78% 0.125 224 / 65%)" />
+            <text x="767" y="134" fill="oklch(99% 0.012 235)" text-anchor="middle" font-size="19" font-weight="900">PartyB Passthrough</text>
+            <text x="767" y="161" fill="oklch(76% 0.05 250)" text-anchor="middle" font-size="14">verifies price range</text>
+            <path d="M900 142 H978" stroke="oklch(78% 0.125 224)" stroke-width="5" marker-end="url(#impl-arrow)" />
+            <rect x="986" y="95" width="40" height="95" rx="18" fill="oklch(85% 0.15 155)" />
+            <text x="1006" y="138" fill="oklch(20% 0.04 245)" text-anchor="middle" font-size="13" font-weight="900">OK</text>
+            <rect x="198" y="285" width="644" height="105" rx="28" fill="oklch(6% 0.035 260)" stroke="oklch(100% 0 0 / 16%)" />
+            <text x="520" y="326" fill="oklch(85% 0.15 155)" text-anchor="middle" font-size="23" font-weight="900">If minPrice &lt;= executionPrice &lt;= maxPrice: execute</text>
+            <text x="520" y="358" fill="oklch(78% 0.14 16)" text-anchor="middle" font-size="23" font-weight="900">Otherwise: reject or revert</text>
+          </svg>
+        </div>
+
+        <div class="grid two" style="margin-top: 16px;">
+          <div class="card">
+            <h3>Frontend states</h3>
+            <ul>
+              <li>Created</li>
+              <li>Solver clarified</li>
+              <li>Bidder accepted</li>
+              <li>Waiting for execution</li>
+              <li>Executed or rejected outside min/max</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Future verifier examples</h3>
+            <ul>
+              <li>Implied volatility below threshold</li>
+              <li>Liquidity above threshold</li>
+              <li>Funding rate acceptable</li>
+              <li>Portfolio exposure remains safe</li>
+              <li>Muon oracle confirms custom condition</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Trust roadmap</div>
+            <h2>Protocol-owned solver today. Provable BestEx tomorrow.</h2>
+          </div>
+          <p>
+            Ivy can start pragmatically with a protocol-owned solver, then progressively constrain the executor with audit logs, sequencing, TEEs, and ZK proofs.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-step">
+            <b>V0</b>
+            <div><h3>Protocol-owned solver</h3><p>The fastest path: a trusted executor monitors intents, sources bids, checks min/max, and executes the best valid bid.</p></div>
+          </div>
+          <div class="timeline-step">
+            <b>V1</b>
+            <div><h3>Auditable execution logs</h3><p>Every execution records intent ID, bid set hash, cutoff, selected bid, rejected bid reasons, verifier result, and settlement calldata hash.</p></div>
+          </div>
+          <div class="timeline-step">
+            <b>V2</b>
+            <div><h3>Zellular sequencing</h3><p>A canonical ordering layer proves which bids existed before cutoff, reducing the executor's ability to hide or rewrite bid history.</p></div>
+          </div>
+          <div class="timeline-step">
+            <b>V3</b>
+            <div><h3>TEE attestation</h3><p>A trusted execution environment attests that the solver ran the correct best-valid-bid algorithm over the sequenced bid set.</p></div>
+          </div>
+          <div class="timeline-step">
+            <b>V4</b>
+            <div><h3>ZK proof of best valid bid</h3><p>A circuit proves the selected bid was eligible, passed the nested verifier, and no better-scoring valid bid existed.</p></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+          <div class="code">BestValidBid =
+  argmax(score(bid))
+  subject to:
+    bid arrived before cutoff
+    nestedVerifier(intent, bid, state) == true
+    bid satisfies protocol rules
+    computeBudget >= verificationCost</div>
+        </div>
+      </section>
+
+      <section class="section" id="close">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Final pitch</div>
+            <h2>The market should reward models, not engines.</h2>
+          </div>
+          <p>
+            Nested Intents do not remove solvers, automation, or fast infrastructure. They make those systems accountable to durable user-defined policy.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>Before</h3>
+            <p>Orders become stale. Traders update constantly. Speed decides who survives. The market rewards lower latency, faster cancellation, and privileged infrastructure.</p>
+          </div>
+          <div class="panel">
+            <h3>After</h3>
+            <p>Mandates remain protected. Verifiers guard execution. Compute is priced explicitly. Pricing models and risk models decide what execution is valid.</p>
+          </div>
+        </div>
+
+        <div class="quote" style="margin-top: 16px;">
+          <p>We do not beat the speed race by building an even faster engine. We beat it by changing what the market rewards.</p>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+          <h3>Source material included</h3>
+          <div class="source-list">
+            <a href="./nested_intents_final_pitch.html">nested_intents_final_pitch.html - speed-race pitch, optimal stopping, V1 architecture, proof roadmap</a>
+            <a href="./_local/nested_intents_explanation.html">_local/nested_intents_explanation.html - core definition, min/max protection, PartyB passthrough, frontend states</a>
+            <a href="./_local/nested_intents_compute_symmio.html">_local/nested_intents_compute_symmio.html - compute-aware execution, SYMMIO fees, Muon verification, template library</a>
+            <a href="./_local/nested_intents_comparison_10_pages.html">_local/nested_intents_comparison_10_pages.html - comparisons with CoW Swap, NEAR Intents, and Anoma</a>
+          </div>
+        </div>
+
+        <footer>
+          Draft interactive pitch document for Ivy / Symmio Nested Intents. This is a concept narrative, not legal, financial, or investment advice.
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const navLinks = Array.from(document.querySelectorAll(".nav a"));
+    const sections = navLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach((link) => {
+            link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+          });
+        });
+      },
+      { rootMargin: "-30% 0px -58% 0px", threshold: 0.01 }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>
